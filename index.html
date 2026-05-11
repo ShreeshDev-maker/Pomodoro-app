@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pomodoro Timer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=EG+Garamond:wght@400;500;600;700&family=Fira+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="main-container">
+      <header>
+        <h1>Pomodoro Timer</h1>
+        <p class="tagline">Focus, Work, Achieve.</p>
+      </header>
+
+      <div class="app-container">
+        <!-- Session Type Selector -->
+        <div class="session-selector">
+          <button class="session-btn active" data-session="work">Work</button>
+          <button class="session-btn" data-session="break">Short Break</button>
+          <button class="session-btn" data-session="long-break">Long Break</button>
+        </div>
+
+        <!-- Session Status -->
+        <div class="session-status">
+          <p class="current-session">Work Session</p>
+        </div>
+
+        <!-- Timer Display -->
+        <div class="timer-section">
+          <div class="app-circle">
+            <div class="circle-shape">
+              <div class="semi-circle right-side circle-mask"></div>
+              <div class="semi-circle right-side circle"></div>
+              <div class="semi-circle left-side circle-mask"></div>
+              <div class="semi-circle left-side circle"></div>
+            </div>
+            <div class="app-counter-box">
+              <p><span class="minutes">25</span>:<span class="seconds">00</span></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Control Buttons -->
+        <div class="controls">
+          <button class="btn btn-start">Start</button>
+          <button class="btn btn-pause" style="display: none;">Pause</button>
+          <button class="btn btn-reset">Reset</button>
+        </div>
+
+        <!-- Time Settings -->
+        <div class="time-settings">
+          <div class="setting-group">
+            <label for="work-duration">Work Duration (min):</label>
+            <input type="number" id="work-duration" min="1" max="60" value="25" />
+          </div>
+          <div class="setting-group">
+            <label for="break-duration">Break Duration (min):</label>
+            <input type="number" id="break-duration" min="1" max="30" value="5" />
+          </div>
+          <div class="setting-group">
+            <label for="long-break-duration">Long Break (min):</label>
+            <input type="number" id="long-break-duration" min="1" max="60" value="15" />
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats">
+          <div class="stat-item">
+            <span class="stat-label">Sessions Completed:</span>
+            <span class="stat-value sessions-count">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Total Focus Time:</span>
+            <span class="stat-value focus-time">0m</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <footer>
+      <pre>       Pomodoro Timer. Made with ❤️ by Shreesh... and JavaScript :D</pre>
+    </footer>
+    <script src="script.js"></script>
+  </body>
+</html>
