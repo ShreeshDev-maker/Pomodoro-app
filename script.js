@@ -338,7 +338,7 @@ function toggleButtons() {
 // Music Player Functions
 function toggleMusic() {
   if (timerState.isMusicPlaying) {
-    stopMusic();
+    pauseMusic();
   } else {
     playMusic();
   }
@@ -349,7 +349,12 @@ function playMusic() {
 
   timerState.isMusicPlaying = true;
   const musicPath = timerState.musicFiles[timerState.currentMusicIndex];
-  backgroundMusic.src = musicPath;
+  
+  // Only set src if it's not already the current track
+  if (backgroundMusic.src !== musicPath && !backgroundMusic.src) {
+    backgroundMusic.src = musicPath;
+  }
+  
   backgroundMusic.play().catch((error) => {
     console.log("Music playback failed:", error);
     timerState.isMusicPlaying = false;
@@ -359,7 +364,7 @@ function playMusic() {
   updateMusicButton();
 }
 
-function stopMusic() {
+function pauseMusic() {
   backgroundMusic.pause();
   timerState.isMusicPlaying = false;
   updateMusicButton();
@@ -379,7 +384,7 @@ function playNextMusic() {
 
 function updateMusicDisplay() {
   const songNumber = timerState.currentMusicIndex + 1;
-  nowPlayingDisplay.textContent = `Now playing: Track ${songNumber} of ${timerState.musicFiles.length}`;
+  nowPlayingDisplay.textContent = "Lo-fi vibes flowing";
 }
 
 function updateMusicButton() {
