@@ -372,14 +372,26 @@ function pauseMusic() {
 }
 
 function playNextMusic() {
-  // Move to next track
+  // Move to next song
   timerState.currentMusicIndex =
-    (timerState.currentMusicIndex + 1) % timerState.musicFiles.length;
+    (timerState.currentMusicIndex + 1) %
+    timerState.musicFiles.length;
 
-  // Auto-play next song if music is enabled
-  if (timerState.isMusicPlaying) {
-    playMusic();
-  }
+  // Load next file
+  backgroundMusic.src =
+    timerState.musicFiles[timerState.currentMusicIndex];
+
+  // Play next song
+  backgroundMusic.play()
+    .then(() => {
+      timerState.isMusicPlaying = true;
+
+      updateMusicDisplay();
+      updateMusicButton();
+    })
+    .catch((error) => {
+      console.log("Next song failed:", error);
+    });
 }
 
 function updateMusicDisplay() {
