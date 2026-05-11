@@ -19,7 +19,8 @@ html {
 body {
   min-height: 100vh;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  justify-content: flex-start;
   align-items: center;
   padding: 20px;
 }
@@ -278,6 +279,19 @@ header h1 {
 
 /* Responsive */
 @media (max-width: 600px) {
+  body {
+    padding: 15px;
+    justify-content: flex-start;
+  }
+
+  .main-container {
+    width: 100%;
+  }
+
+  header {
+    margin-bottom: 20px;
+  }
+
   header h1 {
     font-size: 2.5rem;
   }
@@ -314,6 +328,16 @@ header h1 {
     left: 80px;
     border-top-right-radius: 80px;
     border-bottom-right-radius: 80px;
+  }
+
+  .stats {
+    grid-template-columns: 1fr;
+  }
+
+  footer {
+    margin-top: 20px;
+    padding: 15px 10px;
+    font-size: 0.8rem;
   }
 }
 
