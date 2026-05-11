@@ -14,6 +14,7 @@ html {
   background-image: linear-gradient(135deg, #84bed6, #4283cf, #6539d3);
   background-size: cover;
   background-attachment: fixed;
+  overflow-x: hidden;
 }
 
 body {
@@ -348,9 +349,15 @@ footer {
   padding: 20px;
   color: rgba(216, 233, 239, 0.7);
   font-size: 0.9rem;
+  width: 100%;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
 }
 
 footer p {
   margin: 0;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
