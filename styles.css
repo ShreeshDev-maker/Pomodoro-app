@@ -207,6 +207,36 @@ header h1 {
   transform: scale(0.98);
 }
 
+/* Music Player */
+.music-player {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 15px;
+  margin: 20px 0;
+  border: 1px solid rgba(248, 232, 143, 0.2);
+  text-align: center;
+}
+
+.btn-music {
+  padding: 10px 20px;
+  font-size: 0.95rem;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.btn-music.active {
+  background: #f8e88f;
+  color: #1c545c;
+  border-color: #f8e88f;
+}
+
+.now-playing {
+  color: #90c0d1;
+  font-size: 0.9rem;
+  margin: 0;
+  font-style: italic;
+}
+
 /* Time Settings */
 .time-settings {
   background: rgba(255, 255, 255, 0.05);
