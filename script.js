@@ -323,6 +323,7 @@ function updateStatsDisplay() {
 function toggleButtons() {
   if (timerState.isRunning) {
     startBtn.style.display = "none";
+    pauseBtn.textContent = "Pause";
     pauseBtn.style.display = "inline-block";
   } else if (timerState.isPaused) {
     pauseBtn.textContent = "Resume";
