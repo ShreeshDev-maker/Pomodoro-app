@@ -30,6 +30,7 @@
         <!-- Session Status -->
         <div class="session-status">
           <p class="current-session">Work Session</p>
+          <p class="motivational-quote" id="motivational-quote">Let's get started! 💪</p>
         </div>
 
         <!-- Timer Display -->
@@ -74,6 +75,11 @@
         <div class="music-player">
           <button class="btn btn-music" id="music-toggle">🎵 Play Music</button>
           <p class="now-playing" id="now-playing">Click to start music</p>
+          <div class="volume-control">
+            <label for="volume-slider">Volume:</label>
+            <input type="range" id="volume-slider" min="0" max="100" value="70" />
+            <span id="volume-display">70%</span>
+          </div>
         </div>
 
         <!-- Stats -->
