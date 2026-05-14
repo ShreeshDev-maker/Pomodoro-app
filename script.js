@@ -31,18 +31,19 @@ let timerState = {
   isPaused: false,
   currentSession: "work", // work, break, long-break
   sessionType: "work",
-  totalSeconds: 25 * 60,
-  remainingSeconds: 25 * 60,
-  workRemaining: 25 * 60,
-  breakRemaining: 5 * 60,
+  totalSeconds: 50 * 60,
+  remainingSeconds: 50 * 60,
+  workRemaining: 50 * 60,
+  breakRemaining: 10 * 60,
   longBreakRemaining: 15 * 60,
   interval: null,
   quoteInterval: null,
   currentQuoteIndex: 0,
   sessionsCompleted: 0,
   totalFocusTime: 0,
-  workDuration: 25,
-  breakDuration: 5,
+  sessionElapsedTime: 0,
+  workDuration: 50,
+  breakDuration: 10,
   longBreakDuration: 15,
   musicFiles: [
     "./music/lofi1.mp3",
@@ -136,45 +137,61 @@ function loadSettings() {
   const saved = localStorage.getItem("pomodoroSettings");
   if (saved) {
     const data = JSON.parse(saved);
-    // Validate work duration is between 5-60 minutes (reasonable pomodoro range)
-    const workDur = parseInt(data.workDuration);
-    timerState.workDuration = (workDur >= 5 && workDur <= 60) ? workDur : 25;
-    
-    // Validate break duration is between 1-30 minutes
-    const breakDur = parseInt(data.breakDuration);
-    timerState.breakDuration = (breakDur >= 1 && breakDur <= 30) ? breakDur : 5;
-    
-    // Validate long break is between 5-60 minutes
-    const longBreakDur = parseInt(data.longBreakDuration);
-    timerState.longBreakDuration = (longBreakDur >= 5 && longBreakDur <= 60) ? longBreakDur : 15;
-    
-    timerState.sessionsCompleted = data.sessionsCompleted || 0;
-    timerState.totalFocusTime = data.totalFocusTime || 0;
-
-    workDurationInput.value = timerState.workDuration;
-    breakDurationInput.value = timerState.breakDuration;
-    longBreakDurationInput.value = timerState.longBreakDuration;
-    
-    // Update session-specific remaining times
-    timerState.workRemaining = timerState.workDuration * 60;
-    timerState.breakRemaining = timerState.breakDuration * 60;
-    timerState.longBreakRemaining = timerState.longBreakDuration * 60;
-    
-    // Update display to reflect loaded durations
-    if (timerState.currentSession === "work") {
-      timerState.totalSeconds = timerState.workDuration * 60;
-      timerState.remainingSeconds = timerState.totalSeconds;
-    } else if (timerState.currentSession === "break") {
-      timerState.totalSeconds = timerState.breakDuration * 60;
-      timerState.remainingSeconds = timerState.totalSeconds;
-    } else if (timerState.currentSession === "long-break") {
-      timerState.totalSeconds = timerState.longBreakDuration * 60;
-      timerState.remainingSeconds = timerState.totalSeconds;
+    // Check if we have outdated values - if so, reset to new defaults
+    if (data.workDuration === 25 || data.breakDuration === 5 || data.breakDuration === 7) {
+      // Clear old data and use new defaults
+      localStorage.removeItem("pomodoroSettings");
+      timerState.workDuration = parseInt(workDurationInput.value) || 50;
+      timerState.breakDuration = parseInt(breakDurationInput.value) || 10;
+      timerState.longBreakDuration = parseInt(longBreakDurationInput.value) || 15;
+      timerState.sessionsCompleted = 0;
+      timerState.totalFocusTime = 0;
+    } else {
+      // Validate work duration is between 5-60 minutes (reasonable pomodoro range)
+      const workDur = parseInt(data.workDuration);
+      timerState.workDuration = (workDur >= 5 && workDur <= 60) ? workDur : 50;
+      
+      // Validate break duration is between 1-30 minutes
+      const breakDur = parseInt(data.breakDuration);
+      timerState.breakDuration = (breakDur >= 1 && breakDur <= 30) ? breakDur : 10;
+      
+      // Validate long break is between 5-60 minutes
+      const longBreakDur = parseInt(data.longBreakDuration);
+      timerState.longBreakDuration = (longBreakDur >= 5 && longBreakDur <= 60) ? longBreakDur : 15;
+      
+      timerState.sessionsCompleted = data.sessionsCompleted || 0;
+      timerState.totalFocusTime = data.totalFocusTime || 0;
     }
-    
-    updateDisplay();
-    updateStatsDisplay();
+  } else {
+    // No saved data - use values from HTML inputs (50, 10, 15)
+    timerState.workDuration = parseInt(workDurationInput.value) || 50;
+    timerState.breakDuration = parseInt(breakDurationInput.value) || 10;
+    timerState.longBreakDuration = parseInt(longBreakDurationInput.value) || 15;
   }
+
+  workDurationInput.value = timerState.workDuration;
+  breakDurationInput.value = timerState.breakDuration;
+  longBreakDurationInput.value = timerState.longBreakDuration;
+  
+  // Update session-specific remaining times
+  timerState.workRemaining = timerState.workDuration * 60;
+  timerState.breakRemaining = timerState.breakDuration * 60;
+  timerState.longBreakRemaining = timerState.longBreakDuration * 60;
+  
+  // Update display to reflect loaded durations
+  if (timerState.currentSession === "work") {
+    timerState.totalSeconds = timerState.workDuration * 60;
+    timerState.remainingSeconds = timerState.totalSeconds;
+  } else if (timerState.currentSession === "break") {
+    timerState.totalSeconds = timerState.breakDuration * 60;
+    timerState.remainingSeconds = timerState.totalSeconds;
+  } else if (timerState.currentSession === "long-break") {
+    timerState.totalSeconds = timerState.longBreakDuration * 60;
+    timerState.remainingSeconds = timerState.totalSeconds;
+  }
+  
+  updateDisplay();
+  updateStatsDisplay();
 }
 
 // Change Session Type
@@ -186,17 +203,19 @@ function changeSession(e) {
     return;
   }
   
-  // Save current remaining seconds before switching
-  switch (timerState.currentSession) {
-    case "work":
-      timerState.workRemaining = timerState.remainingSeconds;
-      break;
-    case "break":
-      timerState.breakRemaining = timerState.remainingSeconds;
-      break;
-    case "long-break":
-      timerState.longBreakRemaining = timerState.remainingSeconds;
-      break;
+  // Save current remaining seconds before switching (only if actively running/paused)
+  if (timerState.isRunning || timerState.isPaused) {
+    switch (timerState.currentSession) {
+      case "work":
+        timerState.workRemaining = timerState.remainingSeconds;
+        break;
+      case "break":
+        timerState.breakRemaining = timerState.remainingSeconds;
+        break;
+      case "long-break":
+        timerState.longBreakRemaining = timerState.remainingSeconds;
+        break;
+    }
   }
   
   timerState.currentSession = sessionType;
@@ -217,17 +236,17 @@ function changeSession(e) {
   switch (sessionType) {
     case "work":
       timerState.totalSeconds = timerState.workDuration * 60;
-      timerState.remainingSeconds = timerState.workRemaining;
+      timerState.remainingSeconds = timerState.workRemaining || timerState.totalSeconds;
       currentSessionDisplay.textContent = "Work Session";
       break;
     case "break":
       timerState.totalSeconds = timerState.breakDuration * 60;
-      timerState.remainingSeconds = timerState.breakRemaining;
+      timerState.remainingSeconds = timerState.breakRemaining || timerState.totalSeconds;
       currentSessionDisplay.textContent = "Short Break";
       break;
     case "long-break":
       timerState.totalSeconds = timerState.longBreakDuration * 60;
-      timerState.remainingSeconds = timerState.longBreakRemaining;
+      timerState.remainingSeconds = timerState.longBreakRemaining || timerState.totalSeconds;
       currentSessionDisplay.textContent = "Long Break";
       break;
   }
@@ -295,16 +314,34 @@ function startTimer() {
   timerState.isPaused = false;
   toggleButtons();
   
+  // Auto-play music when work session starts
+  if (timerState.currentSession === "work" && !timerState.isMusicPlaying) {
+    playMusic();
+  }
+  
   // Start quote rotation every 6 minutes (360000ms)
   displayRandomQuote();
   timerState.quoteInterval = setInterval(displayRandomQuote, 360000);
 
+  let secondsCounter = 0;
   timerState.interval = setInterval(() => {
     timerState.remainingSeconds--;
+    secondsCounter++;
 
     // Update display and circle
     updateDisplay();
     updateCircle();
+
+    // Update focus time every minute for work sessions
+    if (timerState.currentSession === "work" && secondsCounter % 60 === 0) {
+      timerState.sessionElapsedTime = Math.floor(
+        (timerState.totalSeconds - timerState.remainingSeconds) / 60
+      );
+      timerState.totalFocusTime = 
+        (timerState.sessionsCompleted * timerState.workDuration) + 
+        timerState.sessionElapsedTime;
+      updateStatsDisplay();
+    }
 
     // Timer complete
     if (timerState.remainingSeconds <= 0) {
@@ -363,17 +400,9 @@ function timerComplete() {
   timerState.isRunning = false;
   timerState.isPaused = false;
 
-  // Play sound
-  if (bellSound) {
-    bellSound.play().catch(() => {
-      console.log("Audio playback failed");
-    });
-  }
-
   // Update stats for work sessions
   if (timerState.currentSession === "work") {
     timerState.sessionsCompleted++;
-    timerState.totalFocusTime += timerState.workDuration;
   }
 
   saveSettings();
@@ -386,15 +415,34 @@ function timerComplete() {
 
   // Auto-switch and auto-start next session
   if (timerState.currentSession === "work") {
+    // Before switching, reset work remaining to full duration
+    timerState.workRemaining = timerState.workDuration * 60;
+    // Play bell sound
+    if (bellSound) {
+      bellSound.play().catch(() => {
+        console.log("Audio playback failed");
+      });
+    }
+    // Stop music when break starts
+    if (timerState.isMusicPlaying) {
+      pauseMusic();
+    }
     const breakSession = document.querySelector('[data-session="break"]');
     breakSession.click(); // Switch to break
     setTimeout(() => {
       startTimer(); // Auto-start the break
     }, 500);
   } else {
-    // After break, go back to work
+    // Before switching, reset break remaining to full duration
+    timerState.breakRemaining = timerState.breakDuration * 60;
+    // Reset elapsed time for next work session
+    timerState.sessionElapsedTime = 0;
     const workSession = document.querySelector('[data-session="work"]');
     workSession.click(); // Switch back to work
+    // Auto-start the next work session
+    setTimeout(() => {
+      startTimer();
+    }, 500);
   }
 
   toggleButtons();
@@ -476,12 +524,10 @@ function playMusic() {
   timerState.isMusicPlaying = true;
   const musicPath = timerState.musicFiles[timerState.currentMusicIndex];
   
-  // Only set src if it's not already the current track
-  if (backgroundMusic.src !== musicPath && !backgroundMusic.src) {
-    backgroundMusic.src = musicPath;
-  }
-  
+  // Always set the src to ensure correct music file is loaded
+  backgroundMusic.src = musicPath;
   backgroundMusic.volume = timerState.volume;
+  
   backgroundMusic.play().catch((error) => {
     console.log("Music playback failed:", error);
     timerState.isMusicPlaying = false;
